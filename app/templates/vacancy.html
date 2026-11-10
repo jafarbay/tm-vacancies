@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}{{ v.title }} — {{ v.city }} · {{ site_name }}{% endblock %}
+{% block description %}{{ (v.summary or v.title)[:160] }}{% endblock %}
+{% block head %}
+{% if site_url %}<link rel="canonical" href="{{ site_url }}/vacancy/{{ v.id }}">{% endif %}
+<script type="application/ld+json">{{ {
+  "@context": "https://schema.org", "@type": "JobPosting",
+  "title": v.title, "description": v.body or v.summary or v.title, "datePosted": v.date, "validThrough": v.date | valid_through,
+  "hiringOrganization": {"@type": "Organization", "name": v.company or "Не указано"},
+  "jobLocation": {"@type": "Place", "address": {"@type": "PostalAddress", "addressLocality": v.city, "addressCountry": "TM"}}
+} | tojson }}</script>
+{% endblock %}
+{% block content %}
+<div class="container detail">
+  <nav class="crumbs"><a href="/">Вакансии</a><span>/</span><a href="{{ url(dir=v.direction) }}">{{ v.direction }}</a><span>/</span><a href="{{ url(city=v.city) }}">{{ v.city }}</a></nav>
+
+  <div class="detail-grid">
+    <article class="panel">
+      <div class="card-top">
+        <span class="tag-dir" style="--h:{{ dir_hue.get(v.direction, 200) }}">{{ v.direction }}</span>
+        <time datetime="{{ v.date }}" class="muted">{{ v.date | human_date }}</time>
+      </div>
+      <h1 class="detail-title">{{ v.title }}</h1>
+      {% if (v.date | age_days) > stale_days %}
+      <div class="stale-note">⚠️ Вакансия опубликована {{ v.date | ago }}. Источник не снимает старые объявления, поэтому она может быть уже закрыта — уточните у работодателя перед откликом.</div>
+      {% endif %}
+      <div class="facts">
+        {% if v.company %}<div><span>Компания</span><a href="{{ url(company=v.company) }}">{{ v.company }}</a></div>{% endif %}
+        <div><span>Город</span><a href="{{ url(city=v.city) }}">{{ v.city }}</a></div>
+        <div><span>Опубликовано</span>{{ (v.posted_at[:19] | human_dt) if v.posted_at else (v.date | human_date) }}</div>
+        {% if v.salary %}<div><span>Зарплата</span><b class="salary-text">{{ v.salary }}</b></div>{% endif %}
+        <div><span>Источник</span><a href="{{ v.url }}" target="_blank" rel="noopener nofollow">business.com.tm ↗</a></div>
+      </div>
+
+      <div class="body">
+        {% if v.body %}{{ v.body | fmt_body }}{% else %}<p>{{ v.summary }}</p><p class="muted">Полное описание появится после ближайшего обновления.</p>{% endif %}
+      </div>
+
+      {% if v.images %}
+      <div class="gallery">
+        {% for src in v.images %}<a href="{{ src }}" target="_blank" rel="noopener"><img src="{{ src }}" alt="{{ v.title }}" loading="lazy"></a>{% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="actions">
+        {% if v.company %}<a class="btn btn-ghost" href="{{ url(company=v.company) }}">Все вакансии компании</a>{% endif %}
+        <a class="btn btn-ghost" href="{{ url(dir=v.direction, city=v.city) }}">{{ v.direction }} · {{ v.city }}</a>
+        <a class="btn btn-ghost src-link" href="{{ v.url }}" target="_blank" rel="noopener nofollow">📰 Открыть оригинал ↗</a>
+      </div>
+    </article>
+
+    <aside>
+      {% if v.contacts %}
+      <div class="panel side contacts">
+        <h3>Контакты</h3>
+        <dl>
+          {% for label, value in v.contacts %}
+          <dt>{{ label }}</dt><dd>{{ contact_html(label, value) }}</dd>
+          {% endfor %}
+        </dl>
+        {% if phone %}<a class="btn btn-call" href="tel:{{ phone }}">Позвонить</a>{% endif %}
+      </div>
+      {% endif %}
+      {% if related %}
+      <div class="panel side">
+        <h3>Похожие вакансии</h3>
+        {% for r in related %}
+        <a class="side-item" href="/vacancy/{{ r.id }}">
+          <b>{{ r.title }}</b>
+          <span class="muted">{{ r.company or r.city }} · {{ r.date | human_date }}</span>
+        </a>
+        {% endfor %}
+        <a class="side-more" href="{{ url(dir=v.direction) }}">Все: {{ v.direction }} →</a>
+      </div>
+      {% endif %}
+    </aside>
+  </div>
+</div>
+{% endblock %}

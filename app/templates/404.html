@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Страница не найдена · {{ site_name }}{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="empty" style="margin:64px auto">
+    <div class="empty-icon">🧭</div>
+    <h2>Страница не найдена</h2>
+    <p class="muted">Возможно, вакансия уже снята с публикации.</p>
+    <a class="btn" href="/">Все вакансии</a>
+  </div>
+</div>
+{% endblock %}

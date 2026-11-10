@@ -1,0 +1,5 @@
+* text=auto
+# shell scripts must keep LF, otherwise bash on the server fails with "\r: command not found"
+*.sh text eol=lf
+nginx.conf text eol=lf
+*.png binary

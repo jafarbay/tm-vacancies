@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}{% if f.dir %}{{ f.dir }} — {% endif %}Вакансии{% if f.city %} — {{ f.city }}{% else %} в Туркменистане{% endif %}{% if page > 1 %}, стр. {{ page }}{% endif %} · {{ site_name }}{% endblock %}
+{% block head %}{% if page > 1 or f.q %}<meta name="robots" content="noindex, follow">{% endif %}{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="container">
+    <h1>Работа в Туркменистане</h1>
+    <p class="hero-sub">Все вакансии с <a href="https://business.com.tm/ru/work/rabota/vakansii" target="_blank" rel="noopener">business.com.tm</a> с фильтрами по городам и направлениям. У каждой вакансии есть ссылка на оригинал.</p>
+    <div class="stats">
+      <div class="stat"><b>{{ stats.total }}</b><span>{{ plural(stats.total, 'вакансия', 'вакансии', 'вакансий') }}</span></div>
+      <div class="stat"><b>{{ stats.week }}</b><span>за неделю</span></div>
+      <div class="stat"><b>{{ stats.companies }}</b><span>{{ plural(stats.companies, 'компания', 'компании', 'компаний') }}</span></div>
+      <div class="stat"><b>{{ stats.cities }}</b><span>{{ plural(stats.cities, 'город', 'города', 'городов') }}</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="container layout">
+  <aside class="sidebar">
+    <details class="filters" open id="filters">
+      <summary>Фильтры{% if active %} <span class="badge">{{ active|length }}</span>{% endif %}</summary>
+
+      <div class="fgroup">
+        <h3>Период</h3>
+        <div class="seg">
+          {% for k, label in periods.items() %}
+          <a href="{{ url(period=k) }}" class="{{ 'on' if f.period == k }}">{{ label }}</a>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="fgroup">
+        <h3>Город</h3>
+        <a href="{{ url(city='') }}" class="opt {{ 'on' if not f.city }}">Все города</a>
+        {% for name, n in cities %}
+        <a href="{{ url(city=name) }}" class="opt {{ 'on' if f.city == name }}">{{ name }}<small>{{ n }}</small></a>
+        {% endfor %}
+      </div>
+
+      <div class="fgroup">
+        <h3>Направление</h3>
+        <a href="{{ url(dir='') }}" class="opt {{ 'on' if not f.dir }}">Все направления</a>
+        {% for name, n in dirs %}
+        <a href="{{ url(dir=name) }}" class="opt {{ 'on' if f.dir == name }}"><i class="dot" style="--h:{{ dir_hue.get(name, 200) }}"></i>{{ name }}<small>{{ n }}</small></a>
+        {% endfor %}
+      </div>
+
+      <div class="fgroup">
+        <h3>Язык объявления</h3>
+        <div class="seg">
+          <a href="{{ url(lang='') }}" class="{{ 'on' if not f.lang }}">Любой</a>
+          {% for code, label in langs.items() %}{% if lang_facet.get(code) %}
+          <a href="{{ url(lang=code) }}" class="{{ 'on' if f.lang == code }}">{{ label }}</a>
+          {% endif %}{% endfor %}
+        </div>
+      </div>
+    </details>
+  </aside>
+
+  <main class="results">
+    <div class="results-head">
+      <div class="count"><b>{{ total }}</b> {{ plural(total, 'вакансия', 'вакансии', 'вакансий') }}</div>
+      {% if active %}
+      <div class="chips">
+        {% for k, v in active %}
+        <a class="chip" href="{{ url(**{k: ''}) }}" title="Убрать фильтр">
+          {% if k == 'q' %}«{{ v }}»{% elif k == 'period' %}{{ periods[v] }}{% elif k == 'lang' %}{{ langs.get(v, v) }}{% else %}{{ v }}{% endif %}
+          <span aria-hidden="true">×</span></a>
+        {% endfor %}
+        <a class="chip chip-reset" href="/">Сбросить всё</a>
+      </div>
+      {% endif %}
+    </div>
+
+    {% if rows %}
+    <div class="cards">
+      {% for r in rows %}{% include "_card.html" %}{% endfor %}
+    </div>
+    {% else %}
+    <div class="empty">
+      <div class="empty-icon">🔍</div>
+      <h2>Ничего не нашлось</h2>
+      <p class="muted">Попробуйте убрать часть фильтров или изменить запрос.</p>
+      <a class="btn" href="/">Все вакансии</a>
+    </div>
+    {% endif %}
+
+    {% if pages > 1 %}
+    <nav class="pager" aria-label="Страницы">
+      {% if page > 1 %}<a href="{{ url(page=page-1) }}" rel="prev">←</a>{% endif %}
+      {% set lo = [1, page - 2]|max %}{% set hi = [pages, page + 2]|min %}
+      {% if lo > 1 %}<a href="{{ url(page=1) }}">1</a>{% if lo > 2 %}<span>…</span>{% endif %}{% endif %}
+      {% for p in range(lo, hi + 1) %}
+        {% if p == page %}<span class="cur">{{ p }}</span>{% else %}<a href="{{ url(page=p) }}">{{ p }}</a>{% endif %}
+      {% endfor %}
+      {% if hi < pages %}{% if hi < pages - 1 %}<span>…</span>{% endif %}<a href="{{ url(page=pages) }}">{{ pages }}</a>{% endif %}
+      {% if page < pages %}<a href="{{ url(page=page+1) }}" rel="next">→</a>{% endif %}
+    </nav>
+    {% endif %}
+  </main>
+</div>
+<script>
+  if (matchMedia("(max-width: 880px)").matches) document.getElementById("filters").removeAttribute("open");
+</script>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% set age = r.date | age_days %}<article class="card{{ ' stale' if age > stale_days }}">
+  <div class="card-top">
+    <span class="tag-dir" style="--h:{{ dir_hue.get(r.direction, 200) }}">{{ r.direction }}</span>
+    <span class="card-date">{% if age <= 2 %}<span class="tag-new">Новая</span>{% elif age > stale_days %}<span class="tag-old" title="Возможно, уже неактуальна">{{ r.date | ago }}</span>{% endif %}<time datetime="{{ r.date }}" class="muted">{{ r.date | human_date }}</time></span>
+  </div>
+  <h2 class="card-title"><a href="/vacancy/{{ r.id }}">{{ r.title }}</a></h2>
+  <div class="card-meta">
+    {% if r.company %}<span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v16M15 9h4a1 1 0 0 1 1 1v11M8 8h3M8 12h3M8 16h3M3 21h18"/></svg>{{ r.company }}</span>{% endif %}
+    <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>{{ r.city }}</span>
+    {% if r.salary %}<span class="salary">{{ r.salary }}</span>{% endif %}
+  </div>
+  {% if r.summary %}<p class="card-desc">{{ r.summary }}</p>{% endif %}
+</article>

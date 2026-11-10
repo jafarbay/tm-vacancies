@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}{{ site_name }}{% endblock %}</title>
+<meta name="description" content="{% block description %}Свежие вакансии в Туркменистане: Ашхабад, Балкан, Мары, Лебап, Дашогуз. Фильтры по городу и направлению.{% endblock %}">
+<meta property="og:site_name" content="{{ site_name }}">
+<meta property="og:title" content="{{ self.title() }}">
+<meta property="og:description" content="{{ self.description() }}">
+<meta name="theme-color" content="#0b7a5c">
+{% block head %}{% endblock %}
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css?v=4">
+</head>
+<body>
+<header class="topbar">
+  <div class="container topbar-in">
+    <a class="logo" href="/"><span class="logo-mark">в</span><span>{{ site_name }}</span></a>
+    <form class="topsearch" action="/" method="get" role="search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input type="search" name="q" value="{{ f.q if f is defined else '' }}" placeholder="Должность, компания, навык…" aria-label="Поиск вакансий">
+      {% if f is defined %}{% for k in ['city','dir','period','lang','company'] %}{% if f[k] %}<input type="hidden" name="{{ k }}" value="{{ f[k] }}">{% endif %}{% endfor %}{% endif %}
+      <button type="submit">Найти</button>
+    </form>
+  </div>
+</header>
+
+{% block content %}{% endblock %}
+
+<footer class="footer">
+  <div class="container footer-in">
+    <div><b>{{ site_name }}</b> — агрегатор вакансий Туркменистана</div>
+    <div class="muted">Источник: <a href="https://business.com.tm/ru/work/rabota/vakansii" target="_blank" rel="noopener">business.com.tm</a> · обновлено {{ stats.updated | human_dt }}</div>
+  </div>
+</footer>
+</body>
+</html>

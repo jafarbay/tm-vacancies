@@ -1,0 +1,21 @@
+# environment
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# secrets: real settings live only on the server
+settings.sh
+.env
+.env.*
+
+# runtime data: scraped DB and logs
+data/
+*.log
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
