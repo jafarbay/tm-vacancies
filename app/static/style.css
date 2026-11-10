@@ -1,9 +1,20 @@
+/* Inter variable, self-hosted (OFL, see fonts/OFL.txt): no third-party request blocking the first paint */
+@font-face { font-family: Inter; font-style: normal; font-weight: 100 900; font-display: swap;
+  src: url(fonts/inter-cyrillic-wght-normal.woff2) format("woff2");
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116; }
+@font-face { font-family: Inter; font-style: normal; font-weight: 100 900; font-display: swap;
+  src: url(fonts/inter-latin-ext-wght-normal.woff2) format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: Inter; font-style: normal; font-weight: 100 900; font-display: swap;
+  src: url(fonts/inter-latin-wght-normal.woff2) format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+
 :root {
   --bg: #f4f6f5;
   --surface: #ffffff;
   --surface-2: #f0f3f2;
   --text: #14201b;
-  --muted: #66736d;
+  --muted: #58655f;
   --line: #e2e8e5;
   --accent: #0b7a5c;
   --accent-hover: #086349;
@@ -15,7 +26,7 @@
   --shadow-hover: 0 2px 4px rgba(16, 32, 26, .06), 0 10px 28px rgba(16, 32, 26, .09);
   --radius: 14px;
   --tag-l: 92%;
-  --tag-tl: 30%;
+  --tag-tl: 25%;
 }
 @media (prefers-color-scheme: dark) {
   :root {
@@ -49,6 +60,8 @@ body {
 }
 a { color: var(--accent); text-decoration: none; }
 a:hover { color: var(--accent-hover); }
+/* links inside running text must not rely on color alone */
+.hero-sub a, .footer a, .body a, .stale-note a { text-decoration: underline; text-underline-offset: 2px; }
 svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
 .muted { color: var(--muted); }
 .container { max-width: 1180px; margin: 0 auto; padding: 0 20px; }
@@ -199,7 +212,7 @@ svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width:
 .salary-text { color: var(--salary); }
 .body { font-size: 15.5px; line-height: 1.7; overflow-wrap: anywhere; }
 .body p { margin: 0 0 12px; }
-.body h3 { margin: 22px 0 8px; font-size: 16px; }
+.body h2 { margin: 22px 0 8px; font-size: 16px; }
 .body ul { margin: 0 0 14px; padding-left: 22px; }
 .body li { margin: 4px 0; }
 .body li::marker { color: var(--accent); }
@@ -216,7 +229,7 @@ svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width:
 .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-top: 20px; }
 .gallery img { width: 100%; border-radius: 10px; border: 1px solid var(--line); display: block; }
 .src-link { margin-left: auto; }
-.side h3 { margin: 0 0 8px; font-size: 15px; }
+.side h2 { margin: 0 0 8px; font-size: 15px; }
 .side-item { display: flex; flex-direction: column; gap: 2px; padding: 10px 0; border-bottom: 1px solid var(--line); }
 .side-item b { color: var(--text); font-size: 14px; line-height: 1.35; font-weight: 600; }
 .side-item:hover b { color: var(--accent); }

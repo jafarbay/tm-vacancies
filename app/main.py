@@ -3,6 +3,7 @@
     uvicorn app.main:app --host 127.0.0.1 --port 8000
 """
 import math
+import mimetypes
 import re
 from datetime import date, datetime, timedelta
 from urllib.parse import urlencode, urlsplit
@@ -27,8 +28,40 @@ MONTHS = ["января", "февраля", "марта", "апреля", "ма�
 DIR_HUE = {name: (i * 360 // (len(DIRECTIONS) + 1) + 150) % 360 for i, name in enumerate([*DIRECTIONS, OTHER])}
 
 db.init()
+mimetypes.add_type("font/woff2", ".woff2")  # not registered on every OS
 app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
+
+# Everything is served from our own origin: no third-party scripts, styles or fonts.
+# style-src allows inline style attributes (tag colors use style="--h:..."); scripts stay strict.
+CSP = ("default-src 'self'; script-src 'self' 'inline-speculation-rules'; style-src 'self' 'unsafe-inline'; "
+       "img-src 'self' data: https:; "
+       "font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; "
+       "object-src 'none'")
+SECURITY_HEADERS = {
+    "Content-Security-Policy": CSP,
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "Permissions-Policy": "camera=(), microphone=(), geolocation=(), interest-cohort=()",
+    "Cross-Origin-Opener-Policy": "same-origin",
+}
+
+
+@app.middleware("http")
+async def headers_middleware(request: Request, call_next):
+    response = await call_next(request)
+    response.headers.update(SECURITY_HEADERS)
+    path = request.url.path
+    if path.startswith("/static/"):
+        # files are versioned (?v=N) or never change (fonts): cache for a year
+        response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+    elif path.startswith("/api/"):
+        response.headers["Cache-Control"] = "public, max-age=60"
+    else:
+        # pages change only after a scraper run (every 30 min): short cache, browser revalidates
+        response.headers["Cache-Control"] = "public, max-age=60, stale-while-revalidate=300"
+    return response
 templates = Jinja2Templates(directory=BASE_DIR / "templates")
 
 
@@ -127,9 +160,9 @@ def fmt_body(text: str | None) -> Markup:
                 in_list = True
             out.append(Markup("<li>{}</li>").format(_linkify(line[2:])))
         elif line.startswith("## "):
-            out.append(Markup("<h3>{}</h3>").format(_linkify(line[3:])))
+            out.append(Markup("<h2>{}</h2>").format(_linkify(line[3:])))
         elif line.endswith(":") and len(line) < 60:
-            out.append(Markup("<h3>{}</h3>").format(_linkify(line.rstrip(":"))))
+            out.append(Markup("<h2>{}</h2>").format(_linkify(line.rstrip(":"))))
         else:
             out.append(Markup("<p>{}</p>").format(_linkify(line)))
     if in_list:

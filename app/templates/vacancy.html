@@ -52,7 +52,7 @@
     <aside>
       {% if v.contacts %}
       <div class="panel side contacts">
-        <h3>Контакты</h3>
+        <h2>Контакты</h2>
         <dl>
           {% for label, value in v.contacts %}
           <dt>{{ label }}</dt><dd>{{ contact_html(label, value) }}</dd>
@@ -63,7 +63,7 @@
       {% endif %}
       {% if related %}
       <div class="panel side">
-        <h3>Похожие вакансии</h3>
+        <h2>Похожие вакансии</h2>
         {% for r in related %}
         <a class="side-item" href="/vacancy/{{ r.id }}">
           <b>{{ r.title }}</b>

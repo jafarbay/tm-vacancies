@@ -40,7 +40,7 @@ def test_short_word_search_is_whole_word(client):
 
 def test_vacancy_page_formatting(client):
     html = client.get("/vacancy/1").text
-    assert "<h3>Требования</h3>" in html
+    assert "<h2>Требования</h2>" in html
     assert 'href="tel:+99361000000"' in html
     assert 'tel:30004000' not in html  # salary range is not a phone
     assert "может быть уже закрыта" in client.get("/vacancy/2").text  # stale warning
